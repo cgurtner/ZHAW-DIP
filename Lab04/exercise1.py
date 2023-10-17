@@ -4,7 +4,6 @@ import skimage
 from scipy.fft import fft2, ifft2
 from scipy.signal import convolve2d
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 import time
 

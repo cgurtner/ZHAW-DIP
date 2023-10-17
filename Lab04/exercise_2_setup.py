@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
@@ -8,7 +8,8 @@ from PIL import Image
 
 
 # ----------------------------------------------------- load image ---------------------------------------------
-file_name = Path('.', 'pics', 'MenInDesert.jpg')
+folder = os.path.join(os.getcwd(), 'Lab04/')
+file_name = os.path.join(folder, 'blurred_image.jpg')
 
 # Open the image with pillow and convert to numpy array
 image = Image.open(file_name)
@@ -39,7 +40,13 @@ modified_image = scipy.fft.ifft2(modified_image_spectrum)
 modified_image = np.real(modified_image)[nFilter:nRows + nFilter, nFilter:nCols + nFilter]
 
 # --------------------------------------------------- reconstruct the image --------------------------------------------
-# here goes your code ...
+
+K = 3e-8
+H_star = np.conj(filter_spectrum)
+F_hat = (H_star * modified_image_spectrum) / (np.abs(filter_spectrum)**2 + K)
+
+reconstructed_image = np.real(scipy.fft.ifft2(F_hat))
+reconstructed_image = reconstructed_image[:gray_pixels.shape[0], :gray_pixels.shape[1]]  # Crop to original size
 
 # --------------------------------------------------------- display images ---------------------------------------------
 fig = plt.figure(1)
@@ -58,7 +65,6 @@ plt.imshow(modified_image, cmap='gray')
 
 plt.subplot(2, 2, 4)
 plt.title('Reconstructed Image')
-# here goes your reconstructed image
-
+plt.imshow(reconstructed_image, cmap='gray')
 
 plt.show()
