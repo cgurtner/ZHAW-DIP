@@ -23,7 +23,7 @@ print(gray_pixels.shape)
 
 # -------------------------------------------- generate the motion blur filter -----------------------------------------
 nFilter = 91
-angle = 30
+angle = 45
 my_filter = np.zeros((nFilter, nFilter))
 my_filter[nFilter//2, :] = 1.0 / nFilter
 my_filter = scipy.ndimage.rotate(my_filter, angle, reshape=False)
@@ -41,9 +41,9 @@ modified_image = np.real(modified_image)[nFilter:nRows + nFilter, nFilter:nCols 
 
 # --------------------------------------------------- reconstruct the image --------------------------------------------
 
-K = 3e-8
+K = 0.02
 H_star = np.conj(filter_spectrum)
-F_hat = (H_star * modified_image_spectrum) / (np.abs(filter_spectrum)**2 + K)
+F_hat = (H_star * image_spectrum) / (np.abs(filter_spectrum)**2 + K)
 
 reconstructed_image = np.real(scipy.fft.ifft2(F_hat))
 reconstructed_image = reconstructed_image[:gray_pixels.shape[0], :gray_pixels.shape[1]]  # Crop to original size
@@ -61,7 +61,6 @@ plt.imshow(my_filter, cmap='gray')
 plt.subplot(2, 2, 3)
 plt.title('Modified Image')
 plt.imshow(modified_image, cmap='gray')
-
 
 plt.subplot(2, 2, 4)
 plt.title('Reconstructed Image')
