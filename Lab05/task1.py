@@ -1,5 +1,5 @@
 # Lab05
-## Task 1
+## Task 1 Locate Squares of Given Size
 
 import os
 import skimage
@@ -13,25 +13,55 @@ original = skimage.io.imread(squaresFilePath)
 
 ## 1
 
-struct = np.ones((5,5))
+struct5x5 = np.ones((5,5))
+struct6x6 = np.ones((6,6))
 
-img_erode = ndimage.binary_erosion(input=original, structure=struct)
-plt.imshow(img_erode)
-plt.show()
-img_erode_5x5 = ndimage.binary_erosion(input=img_erode, structure=np.ones((2,2)))
-plt.imshow(img_erode_5x5)
-plt.show()
+img5x5_erode = ndimage.binary_erosion(original, structure=struct5x5)
+img5x5_dilation = ndimage.binary_dilation(img5x5_erode, structure=struct5x5)
 
-img_diff = img_erode ^ img_erode_5x5 # woher kommen die kanten nach dem diff?
-plt.imshow(img_diff)
+plt.imshow(img5x5_dilation)
 plt.show()
 
-img_dilation = ndimage.binary_dilation(input=img_diff, structure=struct)
+img6x6_erode = ndimage.binary_erosion(original, structure=struct6x6)
+img6x6_dilation = ndimage.binary_dilation(img6x6_erode, structure=struct6x6)
 
-plt.imshow(img_dilation)
+plt.imshow(img6x6_dilation)
+plt.show()
+
+img5x5_isolated = img5x5_dilation ^ img6x6_dilation
+
+plt.imshow(img5x5_isolated)
 plt.show()
 
 ## 2
+def search5x5(image):
+    struct = np.array(
+        [
+            [0, 1, 0], 
+            [1, 1, 1], 
+            [0, 1, 0]
+        ]
+    )
 
+    count = 0
+    while np.sum(image) > 0:
+        seed_x, seed_y = np.transpose(np.nonzero(image))[0]
+        seed = np.zeros_like(image)
+        seed[seed_x, seed_y] = 1
+        
+        prev_sum = 0
+        while np.sum(seed) != prev_sum:
+            prev_sum = np.sum(seed)
+            dilated = ndimage.binary_dilation(seed, structure=struct)
+            seed = dilated & image
+        
+        image[seed == 1] = 0
+        count += 1
 
+    return count
 
+num5x5 = search5x5(img5x5_isolated)
+print(num5x5)
+
+## 3
+### Applying a 5x5 filter and use convolution.
